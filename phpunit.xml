@@ -32,5 +32,7 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="SESSION_ENCRYPT" value="false"/>
+        <env name="CSRF_TOKEN_NAME" value="_token"/>
     </php>
 </phpunit>
