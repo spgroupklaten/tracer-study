@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    use LazilyRefreshDatabase;
     /**
      * Test that the application boots successfully.
      */
@@ -44,5 +46,13 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/alumni/statistics');
         $response->assertStatus(200);
+    }
+
+    /**
+     * Test that home route is registered.
+     */
+    public function test_home_route_is_registered(): void
+    {
+        $this->assertTrue(\Illuminate\Support\Facades\Route::has('home'));
     }
 }

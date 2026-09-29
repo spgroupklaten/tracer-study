@@ -17,7 +17,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Detail Card - PUBLIC VIEW (no sensitive data) -->
     <div class="bg-white shadow rounded-lg overflow-hidden">
         <!-- Header -->
@@ -26,71 +26,63 @@
                 <div class="flex-shrink-0">
                     <div class="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
                         <span class="text-2xl font-bold text-blue-600">
-                            {{ strtoupper(substr($alumni->nama_lengkap, 0, 1)) }}
+                            {{ strtoupper(substr($profile->nama_lengkap, 0, 1)) }}
                         </span>
                     </div>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900">{{ $alumni->nama_lengkap }}</h2>
-                    <p class="text-sm text-gray-500">{{ $alumni->nim }} - {{ $alumni->program_studi }}</p>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1
-                        @if($alumni->status_pekerjaan == 'Bekerja') bg-green-100 text-green-800
-                        @elseif($alumni->status_pekerjaan == 'Belum Bekerja') bg-yellow-100 text-yellow-800
-                        @elseif($alumni->status_pekerjaan == 'Wiraswasta') bg-blue-100 text-blue-800
-                        @elseif($alumni->status_pekerjaan == 'Studi Lanjut') bg-purple-100 text-purple-800
-                        @else bg-gray-100 text-gray-800 @endif">
-                        {{ $alumni->status_pekerjaan }}
-                    </span>
+                    <h2 class="text-xl font-bold text-gray-900">{{ $profile->nama_lengkap }}</h2>
+                    <p class="text-sm text-gray-500">{{ $profile->nim }} - {{ $profile->program_studi }}</p>
                 </div>
             </div>
         </div>
-        
+
         <!-- Detail Content - PUBLIC SAFE DATA ONLY -->
         <div class="px-6 py-5">
             <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                 <!-- NIM -->
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">NIM</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $alumni->nim }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->nim }}</dd>
                 </div>
-                
+
                 <!-- Jenis Kelamin -->
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Jenis Kelamin</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $alumni->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->jenis_kelamin_display }}</dd>
                 </div>
-                
+
                 <!-- Tahun Masuk -->
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Tahun Masuk</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $alumni->tahun_masuk }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->tahun_masuk }}</dd>
                 </div>
-                
+
                 <!-- Tahun Lulus -->
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Tahun Lulus</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $alumni->tahun_lulus }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->tahun_lulus ?? '-' }}</dd>
                 </div>
-                
+
                 <!-- Program Studi -->
                 <div class="sm:col-span-2">
                     <dt class="text-sm font-medium text-gray-500">Program Studi</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $alumni->program_studi }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->program_studi }}</dd>
                 </div>
-                
-                <!-- Pekerjaan -->
+
+                <!-- IPK -->
                 <div class="sm:col-span-1">
-                    <dt class="text-sm font-medium text-gray-500">Pekerjaan</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $alumni->pekerjaan ?? '-' }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">IPK</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->ipk ? number_format($profile->ipk, 2) : '-' }}</dd>
                 </div>
-                
-                <!-- Status Pekerjaan -->
+
+                <!-- Status Akademik -->
                 <div class="sm:col-span-1">
-                    <dt class="text-sm font-medium text-gray-500">Status Pekerjaan</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $alumni->status_pekerjaan }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">Status</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $profile->academic_status_label }}</dd>
                 </div>
             </dl>
-            
+
             <!-- Privacy Notice -->
             <div class="mt-6 p-4 bg-gray-50 rounded-lg">
                 <p class="text-sm text-gray-500">

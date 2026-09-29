@@ -1,52 +1,184 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+    <div class="min-h-screen bg-campus flex items-center justify-center p-4">
+        <!-- Main Panel -->
+        <div class="w-[95vw] md:w-[85vw] lg:w-[60vw] max-w-[950px] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-white/20 flex flex-col">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 px-5 py-3 text-center flex-shrink-0">
+                <h1 class="text-lg sm:text-xl font-bold text-white tracking-wide">ALUMNI & CAREER</h1>
+                <p class="text-blue-200 text-xs">Universitas Muhammadiyah Klaten</p>
+            </div>
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <!-- Content - 2 Column Layout -->
+            <div class="flex-1 flex min-h-0">
+                <!-- Left Panel - Branding -->
+                <div class="hidden lg:flex lg:w-[42%] flex-col items-center justify-center bg-gradient-to-br from-blue-900 to-blue-800 p-4 text-white">
+                    <!-- Logo -->
+                    <div class="w-20 h-20 bg-white/15 backdrop-blur rounded-xl flex items-center justify-center mb-3 border border-white/20">
+                        <span class="text-white font-bold text-2xl">UM</span>
+                    </div>
+
+                    <!-- Branding Text -->
+                    <h2 class="text-lg font-bold text-center mb-1">ALUMNI & CAREER</h2>
+                    <p class="text-blue-200 text-xs text-center mb-3">Universitas Muhammadiyah Klaten</p>
+
+                    <!-- Divider -->
+                    <div class="w-8 h-0.5 bg-yellow-400 mb-3"></div>
+
+                    <!-- Tagline -->
+                    <p class="text-sm font-medium text-white/90">Connect, Grow & Succeed</p>
+                </div>
+
+                <!-- Vertical Divider -->
+                <div class="hidden lg:block w-px bg-blue-200/30"></div>
+
+                <!-- Right Panel - Register Form -->
+                <div class="flex-1 lg:w-[58%] p-5 sm:p-6 flex flex-col justify-center overflow-y-auto">
+                    <!-- Mobile Logo (only visible on mobile/tablet) -->
+                    <div class="lg:hidden flex flex-col items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center mb-2">
+                            <span class="text-white font-bold text-lg">UM</span>
+                        </div>
+                        <h2 class="text-base font-bold text-gray-900">ALUMNI & CAREER</h2>
+                    </div>
+
+                    <!-- Form Header -->
+                    <div class="mb-3">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Daftar Akun</h2>
+                        <p class="text-gray-500 text-sm">Bergabung dengan Alumni & Career</p>
+                    </div>
+
+                    <form method="POST" action="{{ route('register') }}" class="space-y-3">
+                        @csrf
+
+                        <!-- Name -->
+                        <div>
+                            <label for="name" class="block text-xs font-semibold text-gray-700 mb-1">Nama</label>
+                            <input
+                                id="name"
+                                type="text"
+                                name="name"
+                                value="{{ old('name') }}"
+                                required
+                                autofocus
+                                autocomplete="name"
+                                placeholder="Nama lengkap"
+                                class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 @error('name') border-red-400 bg-red-50 @enderror"
+                            >
+                            @error('name')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-xs font-semibold text-gray-700 mb-1">Email</label>
+                            <input
+                                id="email"
+                                type="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                required
+                                autocomplete="username"
+                                placeholder="email@contoh.com"
+                                class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 @error('email') border-red-400 bg-red-50 @enderror"
+                            >
+                            @error('email')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Password -->
+                        <div>
+                            <label for="password" class="block text-xs font-semibold text-gray-700 mb-1">Kata Sandi</label>
+                            <div class="relative">
+                                <input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    autocomplete="new-password"
+                                    placeholder="Minimal 8 karakter"
+                                    class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 @error('password') border-red-400 bg-red-50 @enderror"
+                                >
+                                <button
+                                    type="button"
+                                    onclick="togglePassword('password')"
+                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                                >
+                                    <svg id="eye-icon-password" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            @error('password')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div>
+                            <label for="password_confirmation" class="block text-xs font-semibold text-gray-700 mb-1">Konfirmasi Kata Sandi</label>
+                            <div class="relative">
+                                <input
+                                    id="password_confirmation"
+                                    type="password"
+                                    name="password_confirmation"
+                                    required
+                                    autocomplete="new-password"
+                                    placeholder="Ulangi kata sandi"
+                                    class="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                >
+                                <button
+                                    type="button"
+                                    onclick="togglePassword('password_confirmation')"
+                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                                >
+                                    <svg id="eye-icon-password_confirmation" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            @error('password_confirmation')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Submit -->
+                        <button
+                            type="submit"
+                            class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                        >
+                            DAFTAR
+                        </button>
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="mt-3 text-center">
+                        <p class="text-xs text-gray-500">
+                            Sudah memiliki akun?
+                            <a href="{{ route('login') }}" class="font-semibold text-blue-600 hover:text-blue-700">
+                                Login
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById('eye-icon-' + inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+            }
+        }
+    </script>
 </x-guest-layout>

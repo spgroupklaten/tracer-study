@@ -10,18 +10,24 @@
             <h1 class="text-2xl font-bold text-gray-900">Daftar Alumni</h1>
             <p class="mt-1 text-sm text-gray-500">Tracer Study Alumni</p>
         </div>
-        <div class="mt-4 md:mt-0">
-            <a href="{{ route('alumni.statistics') }}" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 transition-colors shadow-sm">
+        <div class="mt-4 md:mt-0 flex gap-3">
+            <a href="{{ route('alumni.statistics') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 transition-colors shadow-sm">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
                 Statistik
             </a>
+            <a href="{{ route('home') }}" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-600 transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Beranda
+            </a>
         </div>
     </div>
     
     <!-- Search and Filters -->
-    <div class="bg-white shadow rounded-xl mb-6">
+    <div class="bg-white shadow rounded-xl mb-6 border border-gray-100">
         <div class="p-6">
             <form action="{{ route('alumni.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <!-- Search -->
@@ -51,8 +57,8 @@
                 <!-- Tahun Lulus Filter -->
                 <div>
                     <label for="tahun_lulus" class="block text-sm font-medium text-gray-700 mb-1">Tahun Lulus</label>
-                    <select name="tahun_lulus" 
-                            id="tahun_lulus" 
+                    <select name="tahun_lulus"
+                            id="tahun_lulus"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-4 py-2 border">
                         <option value="">Semua</option>
                         @foreach($tahunLulusOptions as $tahun)
@@ -60,23 +66,13 @@
                         @endforeach
                     </select>
                 </div>
-                
-                <!-- Status Pekerjaan Filter -->
-                <div>
-                    <label for="status_pekerjaan" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select name="status_pekerjaan" 
-                            id="status_pekerjaan" 
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-4 py-2 border">
-                        <option value="">Semua</option>
-                        @foreach($statusPekerjaanOptions as $status)
-                            <option value="{{ $status }}" {{ $status_pekerjaan == $status ? 'selected' : '' }}>{{ $status }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                
+
                 <!-- Filter Buttons -->
                 <div class="md:col-span-5 flex gap-2">
                     <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
                         Filter
                     </button>
                     <a href="{{ route('alumni.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-lg font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 transition-colors">
@@ -88,7 +84,7 @@
     </div>
     
     <!-- Alumni Table - PUBLIC VIEW (no sensitive data) -->
-    <div class="bg-white shadow rounded-xl overflow-hidden">
+    <div class="bg-white shadow rounded-xl overflow-hidden border border-gray-100">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -99,14 +95,13 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">JK</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program Studi</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thn Lulus</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($alumni as $key => $item)
+                    @forelse($profiles as $key => $item)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $alumni->firstItem() + $key }}
+                                {{ $profiles->firstItem() + $key }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {{ $item->nim }}
@@ -128,27 +123,12 @@
                                 {{ $item->program_studi }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item->tahun_lulus }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                    $statusColors = [
-                                        'Bekerja' => 'bg-green-100 text-green-800',
-                                        'Belum Bekerja' => 'bg-yellow-100 text-yellow-800',
-                                        'Wiraswasta' => 'bg-blue-100 text-blue-800',
-                                        'Studi Lanjut' => 'bg-purple-100 text-purple-800',
-                                        'Lainnya' => 'bg-gray-100 text-gray-800'
-                                    ];
-                                    $colorClass = $statusColors[$item->status_pekerjaan] ?? 'bg-gray-100 text-gray-800';
-                                @endphp
-                                <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full {{ $colorClass }}">
-                                    {{ $item->status_pekerjaan }}
-                                </span>
+                                {{ $item->tahun_lulus ?? '-' }}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-16 text-center">
+                            <td colspan="6" class="px-6 py-16 text-center">
                                 <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
@@ -159,16 +139,16 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Pagination -->
-        @if($alumni->hasPages())
+        @if($profiles->hasPages())
             <div class="px-6 py-4 bg-white border-t border-gray-200">
                 <div class="flex items-center justify-between">
                     <div class="text-sm text-gray-500">
-                        Menampilkan {{ $alumni->firstItem() }} hingga {{ $alumni->lastItem() }} dari {{ $alumni->total() }} data
+                        Menampilkan {{ $profiles->firstItem() }} hingga {{ $profiles->lastItem() }} dari {{ $profiles->total() }} data
                     </div>
                     <div>
-                        {{ $alumni->links() }}
+                        {{ $profiles->links() }}
                     </div>
                 </div>
             </div>

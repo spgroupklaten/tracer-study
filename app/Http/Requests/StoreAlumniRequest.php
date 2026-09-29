@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAlumniRequest extends FormRequest
 {
@@ -21,6 +22,8 @@ class StoreAlumniRequest extends FormRequest
      */
     public function rules(): array
     {
+        $currentYear = (int) date('Y');
+        
         return [
             'nim' => 'required|string|max:20|unique:alumni,nim',
             'nama_lengkap' => 'required|string|max:100',
@@ -29,17 +32,28 @@ class StoreAlumniRequest extends FormRequest
             'tanggal_lahir' => 'required|date|before:today',
             'email' => 'required|email|max:100|unique:alumni,email',
             'nomor_hp' => 'nullable|string|max:20',
-            'tahun_masuk' => 'required|integer|min:1990|max:' . date('Y'),
+            'tahun_masuk' => 'required|integer|min:1990|max:' . $currentYear,
             'tahun_lulus' => [
                 'required',
                 'integer',
                 'min:1990',
-                function ($attribute, $value, $fail) {
-                    $tahunMasuk = $this->input('tahun_masuk');
-                    if ($tahunMasuk && $value < $tahunMasuk) {
+                'max:' . $currentYear,
+                function ($attribute, $value, $fail) use ($currentYear) {
+                    $tahunMasuk = (int) $this->input('tahun_masuk');
+                    $tahunLulus = (int) $value;
+                    
+                    // Validasi tahun lulus tidak boleh lebih besar dari tahun sekarang
+                    if ($tahunLulus > $currentYear) {
+                        $fail('Tahun lulus tidak boleh lebih besar dari tahun sekarang (' . $currentYear . ').');
+                    }
+                    
+                    // Validasi tahun lulus tidak boleh sebelum tahun masuk
+                    if ($tahunMasuk && $tahunLulus < $tahunMasuk) {
                         $fail('Tahun lulus tidak boleh sebelum tahun masuk.');
                     }
-                    if ($tahunMasuk && ($value - $tahunMasuk) > 10) {
+                    
+                    // Validasi selisih tahun masuk dan lulus tidak lebih dari 10 tahun
+                    if ($tahunMasuk && ($tahunLulus - $tahunMasuk) > 10) {
                         $fail('Selisih tahun masuk dan tahun lulus tidak boleh lebih dari 10 tahun.');
                     }
                 },
@@ -79,5 +93,4 @@ class StoreAlumniRequest extends FormRequest
             'program_studi.required' => 'Program studi wajib diisi.',
         ];
     }
-
 }

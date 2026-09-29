@@ -18,11 +18,14 @@
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('alumni.index')" :active="request()->routeIs('alumni.*')">
+                            <x-nav-link :href="route('alumni.index')" :active="request()->routeIs('alumni.index')">
                                 {{ __('Data Alumni') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('alumni.statistics')" :active="request()->routeIs('statistics')">
+                            <x-nav-link :href="route('admin.statistics.tracer-study')" :active="request()->routeIs('admin.statistics.*')">
                                 {{ __('Statistik') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.kuesioner.index')" :active="request()->routeIs('admin.kuesioner.*')">
+                                {{ __('Kuesioner') }}
                             </x-nav-link>
                         </div>
                     @else
@@ -46,7 +49,7 @@
                         <x-slot name="trigger">
                             <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                                 <div>{{ Auth::user()->name }}</div>
-                                <span class="ms-1 text-xs text-gray-400">({{ Auth::user()->role->label() }})</span>
+                                <span class="ms-1 text-xs text-gray-400">({{ Auth::user()->academic_status_label }})</span>
 
                                 <div class="ms-1">
                                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -97,11 +100,14 @@
                     <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('alumni.index')" :active="request()->routeIs('alumni.*')">
+                    <x-responsive-nav-link :href="route('alumni.index')" :active="request()->routeIs('alumni.index')">
                         {{ __('Data Alumni') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('alumni.statistics')" :active="request()->routeIs('statistics')">
+                    <x-responsive-nav-link :href="route('admin.statistics.tracer-study')" :active="request()->routeIs('admin.statistics.*')">
                         {{ __('Statistik') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.kuesioner.index')" :active="request()->routeIs('admin.kuesioner.*')">
+                        {{ __('Kuesioner') }}
                     </x-responsive-nav-link>
                 </div>
             @else

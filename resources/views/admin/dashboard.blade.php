@@ -1,110 +1,236 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Dashboard Admin')
 
+@section('page-title', 'Dashboard')
+
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Welcome Section -->
-    <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl shadow-xl overflow-hidden mb-8">
-        <div class="px-8 py-10 md:px-12">
-            <div class="max-w-3xl">
-                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">
-                    Selamat Datang, {{ Auth::user()->name }}!
-                </h1>
-                <p class="text-blue-100 mb-4">
-                    Role: <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white">
-                        {{ Auth::user()->role->label() }}
-                    </span>
-                </p>
-                <p class="text-blue-100">
-                    Anda login sebagai Administrator. Kelola data alumni dan sistem tracer study melalui menu di bawah.
-                </p>
+<!-- Welcome Section -->
+<div class="rounded" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 1.25rem;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2 class="mb-1" style="color: #ffffff; font-size: 1.375rem; font-weight: 600;">
+                Selamat Datang, {{ Auth::user()->name }}!
+            </h2>
+            <p class="mb-0" style="color: rgba(255,255,255,0.85); font-size: 0.875rem;">
+                Anda login sebagai <span class="badge" style="background: rgba(255,255,255,0.2); color: #ffffff;">{{ Auth::user()->role->label() }}</span>
+            </p>
+        </div>
+        <a href="{{ route('admin.alumni.create') }}"
+           class="btn" style="background: #ffffff; color: #2563eb; font-weight: 500; padding: 0.5rem 1rem;">
+            <i class="fas fa-plus me-1"></i> Tambah Alumni
+        </a>
+    </div>
+</div>
+
+<!-- Statistics Cards Row 1 -->
+<div class="row g-4 mt-4">
+    <!-- Total Alumni -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stats-card" style="padding: 1.125rem;">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="text-muted mb-1" style="font-size: 0.8125rem; font-weight: 500;">Total Alumni</p>
+                    <h3 class="mb-0" style="font-size: 1.875rem; font-weight: 700; color: #111827; line-height: 1.1;">{{ $totalAlumni }}</h3>
+                    <p class="text-muted mt-1 mb-0" style="font-size: 0.75rem;">Mahasiswa terdaftar</p>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem; background: #dbeafe; flex-shrink: 0;">
+                    <i class="fas fa-users" style="color: #2563eb; font-size: 1rem;"></i>
+                </div>
+            </div>
+            <div class="mt-3 pt-2" style="border-top: 1px solid #f0f0f0;">
+                <a href="{{ route('admin.alumni.index') }}" class="text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.8125rem; font-weight: 500; color: #2563eb;">
+                    Lihat Data Alumni <i class="fas fa-arrow-right" style="font-size: 0.6875rem;"></i>
+                </a>
             </div>
         </div>
     </div>
-    
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">Total Alumni</p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900">{{ $totalAlumni }}</p>
-                    </div>
-                    <div class="p-3 bg-blue-100 rounded-lg">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                    </div>
+
+    <!-- Total Mahasiswa -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stats-card" style="padding: 1.125rem;">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="text-muted mb-1" style="font-size: 0.8125rem; font-weight: 500;">Total Mahasiswa</p>
+                    <h3 class="mb-0" style="font-size: 1.875rem; font-weight: 700; color: #111827; line-height: 1.1;">{{ $totalMahasiswa }}</h3>
+                    <p class="text-muted mt-1 mb-0" style="font-size: 0.75rem;">User mahasiswa</p>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem; background: #dcfce7; flex-shrink: 0;">
+                    <i class="fas fa-user-graduate" style="color: #16a34a; font-size: 1rem;"></i>
                 </div>
             </div>
-        </div>
-        
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">Menu Utama</p>
-                        <p class="mt-2 text-lg font-bold text-gray-900">Data Alumni</p>
-                    </div>
-                    <div class="p-3 bg-green-100 rounded-lg">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                        </svg>
-                    </div>
-                </div>
+            <div class="mt-3 pt-2" style="border-top: 1px solid #f0f0f0;">
+                <a href="{{ route('admin.mahasiswa.index') }}" class="text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.8125rem; font-weight: 500; color: #16a34a;">
+                    Lihat Data Mahasiswa <i class="fas fa-arrow-right" style="font-size: 0.6875rem;"></i>
+                </a>
             </div>
         </div>
-        
-        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500">Menu Utama</p>
-                        <p class="mt-2 text-lg font-bold text-gray-900">Kuesioner</p>
-                    </div>
-                    <div class="p-3 bg-purple-100 rounded-lg">
-                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
+    </div>
+
+    <!-- Total Tracer Study -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stats-card" style="padding: 1.125rem;">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="text-muted mb-1" style="font-size: 0.8125rem; font-weight: 500;">Tracer Study</p>
+                    <h3 class="mb-0" style="font-size: 1.875rem; font-weight: 700; color: #111827; line-height: 1.1;">{{ $totalAlumni }}</h3>
+                    <p class="text-muted mt-1 mb-0" style="font-size: 0.75rem;">Total alumni</p>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem; background: #e0e7ff; flex-shrink: 0;">
+                    <i class="fas fa-clipboard-list" style="color: #6366f1; font-size: 1rem;"></i>
+                </div>
+            </div>
+            <div class="mt-3 pt-2" style="border-top: 1px solid #f0f0f0;">
+                <a href="{{ route('admin.tracer-study.index') }}" class="text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.8125rem; font-weight: 500; color: #6366f1;">
+                    Lihat Tracer Study <i class="fas fa-arrow-right" style="font-size: 0.6875rem;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Belum Bekerja -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stats-card" style="padding: 1.125rem;">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <p class="text-muted mb-1" style="font-size: 0.8125rem; font-weight: 500;">Belum Bekerja</p>
+                    <h3 class="mb-0" style="font-size: 1.875rem; font-weight: 700; color: #111827; line-height: 1.1;">{{ $alumniBelumBekerja }}</h3>
+                    <p class="text-muted mt-1 mb-0" style="font-size: 0.75rem;">Sedang mencari</p>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center" style="width: 2.5rem; height: 2.5rem; background: #fef9c3; flex-shrink: 0;">
+                    <i class="fas fa-clock" style="color: #ca8a04; font-size: 1rem;"></i>
+                </div>
+            </div>
+            <div class="mt-3 pt-2" style="border-top: 1px solid #f0f0f0;">
+                <a href="{{ route('admin.alumni.index') }}" class="text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.8125rem; font-weight: 500; color: #ca8a04;">
+                    Lihat Semua <i class="fas fa-arrow-right" style="font-size: 0.6875rem;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary Stats Row -->
+<div class="row g-4 mt-4">
+    <!-- Bekerja -->
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="stats-card" style="padding: 1rem;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1" style="font-size: 0.8125rem; font-weight: 500;">Bekerja</p>
+                    <h3 class="mb-0" style="font-size: 1.5rem; font-weight: 700; color: #111827; line-height: 1.1;">{{ $alumniBekerja }}</h3>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem; background: #dcfce7; flex-shrink: 0;">
+                    <i class="fas fa-briefcase" style="color: #16a34a; font-size: 0.875rem;"></i>
                 </div>
             </div>
         </div>
     </div>
-    
+
+    <!-- Studi Lanjut -->
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="stats-card" style="padding: 1rem;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1" style="font-size: 0.8125rem; font-weight: 500;">Studi Lanjut</p>
+                    <h3 class="mb-0" style="font-size: 1.5rem; font-weight: 700; color: #111827; line-height: 1.1;">{{ $alumniStudiLanjut }}</h3>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem; background: #f3e8ff; flex-shrink: 0;">
+                    <i class="fas fa-graduation-cap" style="color: #9333ea; font-size: 0.875rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin -->
+    <div class="col-12 col-sm-6 col-lg-4">
+        <div class="stats-card" style="padding: 1rem;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-1" style="font-size: 0.8125rem; font-weight: 500;">Admin</p>
+                    <h3 class="mb-0" style="font-size: 1.5rem; font-weight: 700; color: #111827; line-height: 1.1;">{{ $totalAdmin }}</h3>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center" style="width: 2.25rem; height: 2.25rem; background: #dbeafe; flex-shrink: 0;">
+                    <i class="fas fa-user-shield" style="color: #2563eb; font-size: 0.875rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Two Column Layout -->
+<div class="row g-4 mt-4">
+    <!-- Program Studi -->
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header py-2">
+                <span><i class="fas fa-chart-bar me-2 text-muted"></i>Program Studi Populer</span>
+            </div>
+            <div class="card-body" style="padding: 1rem;">
+                @if($programStudis->count() > 0)
+                    @foreach($programStudis as $ps)
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.875rem;">
+                                <span style="font-weight: 600; color: #374151;">{{ $ps->program_studi }}</span>
+                                <span style="color: #6b7280; font-weight: 500;">{{ $ps->total }} alumni</span>
+                            </div>
+                            <div class="progress" style="height: 0.375rem;">
+                                <div class="progress-bar" role="progressbar" style="width: {{ ($ps->total / $totalAlumni) * 100 }}%; background: #2563eb;"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <p class="text-muted text-center mb-0 py-4">Belum ada data program studi</p>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Aksi Cepat</h2>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="{{ route('admin.alumni.index') }}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <svg class="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span class="text-sm font-medium text-gray-700">Kelola Alumni</span>
-                </a>
-                <a href="{{ route('admin.alumni.create') }}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    <span class="text-sm font-medium text-gray-700">Tambah Alumni</span>
-                </a>
-                <a href="{{ route('alumni.statistics') }}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <svg class="w-6 h-6 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    <span class="text-sm font-medium text-gray-700">Statistik</span>
-                </a>
-                <a href="{{ route('admin.alumni.export') }}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <svg class="w-6 h-6 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <span class="text-sm font-medium text-gray-700">Export Data</span>
-                </a>
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header py-2">
+                <span><i class="fas fa-bolt me-2 text-muted"></i>Aksi Cepat</span>
+            </div>
+            <div class="card-body p-3">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <a href="{{ route('admin.alumni.index') }}" class="btn btn-light w-100 text-start py-2 px-3">
+                            <i class="fas fa-users me-2" style="color: #2563eb;"></i>
+                            <span style="font-size: 0.8125rem; font-weight: 500;">Kelola Alumni</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ route('admin.alumni.create') }}" class="btn btn-light w-100 text-start py-2 px-3">
+                            <i class="fas fa-user-plus me-2" style="color: #16a34a;"></i>
+                            <span style="font-size: 0.8125rem; font-weight: 500;">Tambah Alumni</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ route('alumni.statistics') }}" class="btn btn-light w-100 text-start py-2 px-3">
+                            <i class="fas fa-chart-pie me-2" style="color: #9333ea;"></i>
+                            <span style="font-size: 0.8125rem; font-weight: 500;">Statistik</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ route('admin.tracer-study.index') }}" class="btn btn-light w-100 text-start py-2 px-3">
+                            <i class="fas fa-clipboard-list me-2" style="color: #6366f1;"></i>
+                            <span style="font-size: 0.8125rem; font-weight: 500;">Tracer Study</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ route('admin.alumni.export') }}" class="btn btn-light w-100 text-start py-2 px-3">
+                            <i class="fas fa-file-export me-2" style="color: #ea580c;"></i>
+                            <span style="font-size: 0.8125rem; font-weight: 500;">Export CSV</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a href="{{ route('admin.kuesioner.index') }}" class="btn btn-light w-100 text-start py-2 px-3">
+                            <i class="fas fa-question-circle me-2" style="color: #0891b2;"></i>
+                            <span style="font-size: 0.8125rem; font-weight: 500;">Kuesioner</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

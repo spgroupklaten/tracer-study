@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Alumni;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 
 class AlumniController extends Controller
 {
     /**
-     * Display a listing of the resource (PUBLIC - limited data).
+     * Display a listing of alumni profiles (PUBLIC - limited data).
      */
     public function index(Request $request)
     {
@@ -16,15 +16,14 @@ class AlumniController extends Controller
         $search = $request->input('search', '');
         $program_studi = $request->input('program_studi', '');
         $tahun_lulus = $request->input('tahun_lulus', '');
-        $status_pekerjaan = $request->input('status_pekerjaan', '');
 
-        $query = Alumni::query();
+        $query = Profile::lulus()
+            ->with('user:id,name');
 
-        // Apply search filter
+        // Apply search filter (only nim and program_studi are searchable publicly)
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('nim', 'like', '%' . $search . '%')
-                  ->orWhere('nama_lengkap', 'like', '%' . $search . '%')
                   ->orWhere('program_studi', 'like', '%' . $search . '%');
             });
         }
@@ -38,62 +37,44 @@ class AlumniController extends Controller
             $query->where('tahun_lulus', $tahun_lulus);
         }
 
-        if ($status_pekerjaan) {
-            $query->where('status_pekerjaan', $status_pekerjaan);
-        }
-
         // Order by latest
         $query->orderBy('created_at', 'desc');
 
-        // Paginate results
-        $alumni = $query->select([
-            'id', 'nim', 'nama_lengkap', 'jenis_kelamin', 
-            'tahun_masuk', 'tahun_lulus', 'program_studi', 
-            'status_pekerjaan', 'pekerjaan', 'created_at'
+        // Paginate results (only public-safe columns)
+        $profiles = $query->select([
+            'id', 'nim', 'jenis_kelamin',
+            'tahun_masuk', 'tahun_lulus', 'program_studi',
+            'created_at'
         ])->paginate($perPage)->withQueryString();
 
         // Get unique values for filters
-        $programStudis = Alumni::distinct()->pluck('program_studi')->sort()->values();
-        $tahunLulusOptions = Alumni::distinct()->pluck('tahun_lulus')->sortDesc()->values();
-        $statusPekerjaanOptions = Alumni::distinct()->pluck('status_pekerjaan')->sort()->values();
+        $programStudis = Profile::lulus()->distinct()->pluck('program_studi')->sort()->values();
+        $tahunLulusOptions = Profile::lulus()->distinct()->pluck('tahun_lulus')->sortDesc()->values();
 
         return view('alumni.index', compact(
-            'alumni',
+            'profiles',
             'search',
             'program_studi',
             'tahun_lulus',
-            'status_pekerjaan',
             'programStudis',
             'tahunLulusOptions',
-            'statusPekerjaanOptions',
             'perPage'
         ));
     }
 
     /**
-     * Display the specified resource (PUBLIC - limited data).
+     * Display the specified profile (PUBLIC - limited data).
      */
-    public function show(Alumni $alumni)
+    public function show(Profile $alumni)
     {
-        // Show only public-safe data
-        $publicData = [
-            'id' => $alumni->id,
-            'nim' => $alumni->nim,
-            'nama_lengkap' => $alumni->nama_lengkap,
-            'jenis_kelamin' => $alumni->jenis_kelamin,
-            'tahun_masuk' => $alumni->tahun_masuk,
-            'tahun_lulus' => $alumni->tahun_lulus,
-            'program_studi' => $alumni->program_studi,
-            'status_pekerjaan' => $alumni->status_pekerjaan,
-            'pekerjaan' => $alumni->pekerjaan,
-            'created_at' => $alumni->created_at,
-            'updated_at' => $alumni->updated_at,
-        ];
+        // Only show profiles with status lulus
+        if (!$alumni->isLulus()) {
+            abort(404);
+        }
 
         // Return a view that only shows public data
-        // For show page, we'll use a modified view
         return view('alumni.show', [
-            'alumni' => (object) $publicData,
+            'profile' => $alumni,
             'isPublic' => true
         ]);
     }
@@ -103,26 +84,32 @@ class AlumniController extends Controller
      */
     public function statistics()
     {
-        $totalAlumni = Alumni::count();
-        $totalLaki = Alumni::where('jenis_kelamin', 'L')->count();
-        $totalPerempuan = Alumni::where('jenis_kelamin', 'P')->count();
-        $totalBekerja = Alumni::where('status_pekerjaan', 'Bekerja')->count();
-        $totalBelumBekerja = Alumni::where('status_pekerjaan', 'Belum Bekerja')->count();
-        
-        $latestAlumni = Alumni::select(['id', 'nim', 'nama_lengkap', 'program_studi', 'status_pekerjaan', 'tahun_lulus'])
+        $totalAlumni = Profile::lulus()->count();
+        $totalLaki = Profile::lulus()->where('jenis_kelamin', 'L')->count();
+        $totalPerempuan = Profile::lulus()->where('jenis_kelamin', 'P')->count();
+
+        $latestAlumni = Profile::lulus()
+            ->with('user:id,name')
+            ->select(['id', 'nim', 'program_studi', 'tahun_lulus'])
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
-        
-        $byProgramStudi = Alumni::selectRaw('program_studi, COUNT(*) as total')
+
+        $byProgramStudi = Profile::lulus()
+            ->selectRaw('program_studi, COUNT(*) as total')
             ->groupBy('program_studi')
             ->get();
 
-        $byTahunLulus = Alumni::selectRaw('tahun_lulus, COUNT(*) as total')
+        $byTahunLulus = Profile::lulus()
+            ->selectRaw('tahun_lulus, COUNT(*) as total')
             ->groupBy('tahun_lulus')
             ->orderBy('tahun_lulus', 'desc')
             ->limit(10)
             ->get();
+
+        // Placeholder values for work statistics (not yet in profiles)
+        $totalBekerja = 0;
+        $totalBelumBekerja = 0;
 
         return view('alumni.statistics', compact(
             'totalAlumni',
@@ -138,31 +125,30 @@ class AlumniController extends Controller
 
     /**
      * Export alumni data to CSV (PUBLIC - limited data).
-     * Note: This should be protected in routes, but providing safe data here too
      */
     public function export()
     {
-        // Note: Export should be admin-only, but this serves as fallback
-        // Only export non-sensitive data
-        $alumni = Alumni::select([
-            'nim', 'nama_lengkap', 'jenis_kelamin',
-            'tahun_masuk', 'tahun_lulus', 'program_studi',
-            'status_pekerjaan', 'pekerjaan'
-        ])->orderBy('tahun_lulus', 'desc')->get();
+        // Only export non-sensitive data for profiles with status lulus
+        $profiles = Profile::lulus()
+            ->with('user:id,name')
+            ->select([
+                'nim', 'jenis_kelamin',
+                'tahun_masuk', 'tahun_lulus', 'program_studi'
+            ])
+            ->orderBy('tahun_lulus', 'desc')
+            ->get();
 
-        $csvContent = "NIM,Nama Lengkap,Jenis Kelamin,Tahun Masuk,Tahun Lulus,Program Studi,Status Pekerjaan,Pekerjaan\n";
-        
-        foreach ($alumni as $a) {
+        $csvContent = "NIM,Nama Lengkap,Jenis Kelamin,Tahun Masuk,Tahun Lulus,Program Studi\n";
+
+        foreach ($profiles as $p) {
             $csvContent .= sprintf(
-                "%s,%s,%s,%s,%s,%s,%s,%s\n",
-                $a->nim,
-                str_replace(',', ';', $a->nama_lengkap),
-                $a->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan',
-                $a->tahun_masuk,
-                $a->tahun_lulus,
-                str_replace(',', ';', $a->program_studi),
-                $a->status_pekerjaan,
-                str_replace(',', ';', $a->pekerjaan ?? '')
+                "%s,%s,%s,%s,%s,%s\n",
+                $p->nim,
+                str_replace(',', ';', $p->nama_lengkap),
+                $p->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan',
+                $p->tahun_masuk,
+                $p->tahun_lulus ?? '',
+                str_replace(',', ';', $p->program_studi)
             );
         }
 

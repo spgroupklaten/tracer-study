@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -53,5 +54,29 @@ class User extends Authenticatable
     public function hasRole(Role $role): bool
     {
         return $this->role === $role;
+    }
+
+    /**
+     * Get the alumni associated with this user (legacy, for migration).
+     */
+    public function alumni(): HasOne
+    {
+        return $this->hasOne(Alumni::class);
+    }
+
+    /**
+     * Get the profile associated with this user.
+     */
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    /**
+     * Get the display name for academic status (based on profile).
+     */
+    public function getAcademicStatusLabelAttribute(): string
+    {
+        return $this->profile?->academic_status_label ?? ($this->isAdmin() ? 'Administrator' : 'Unknown');
     }
 }

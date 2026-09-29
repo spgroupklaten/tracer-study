@@ -1,163 +1,192 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Tambah Alumni')
 
+@section('page-title', 'Alumni')
+
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Page Header -->
-    <div class="mb-6">
-        <div class="flex items-center gap-4">
-            <a href="{{ route('admin.alumni.index') }}" class="text-gray-500 hover:text-gray-700">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-            </a>
-            <h1 class="text-2xl font-bold text-gray-900">Tambah Alumni</h1>
-        </div>
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0" style="font-size: 1.25rem; font-weight: 600; color: #111827;">Tambah Alumni</h1>
+        <p class="mb-0 text-muted" style="font-size: 0.8125rem;">Tambah user + profile alumni baru (status: lulus)</p>
     </div>
-    
-    <!-- Form -->
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-6 py-6">
-            @if($errors->any())
-                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                    <ul class="list-disc list-inside">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+    <a href="{{ route('admin.alumni.index') }}" class="btn btn-sm btn-default">
+        <i class="fas fa-arrow-left me-1"></i> Kembali
+    </a>
+</div>
+
+<!-- Form -->
+<div class="card">
+    <form action="{{ route('admin.alumni.store') }}" method="POST">
+        @csrf
+
+        <!-- Flash Errors -->
+        @if($errors->any())
+            <div class="m-4 p-3 bg-danger bg-opacity-10 border border-danger rounded">
+                <div class="d-flex align-items-center gap-2 mb-2 text-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span class="fw-semibold">Terjadi kesalahan:</span>
                 </div>
-            @endif
-            
-            <form action="{{ route('admin.alumni.store') }}" method="POST">
-                @csrf
-                
-                <!-- Data Pribadi -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">Data Pribadi</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- NIM -->
-                        <div>
-                            <label for="nim" class="block text-sm font-medium text-gray-700 mb-1">NIM <span class="text-red-500">*</span></label>
-                            <input type="text" name="nim" id="nim" value="{{ old('nim') }}" required
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('nim') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: 12345678">
-                            @error('nim')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Nama Lengkap -->
-                        <div>
-                            <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-                            <input type="text" name="nama_lengkap" id="nama_lengkap" value="{{ old('nama_lengkap') }}" required
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('nama_lengkap') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: Budi Santoso">
-                            @error('nama_lengkap')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Jenis Kelamin -->
-                        <div>
-                            <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
-                            <select name="jenis_kelamin" id="jenis_kelamin" required
-                                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('jenis_kelamin') border-red-500 @enderror px-4 py-2 border">
-                                <option value="">Pilih</option>
-                                <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                                <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                            </select>
-                            @error('jenis_kelamin')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Tempat Lahir -->
-                        <div>
-                            <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 mb-1">Tempat Lahir <span class="text-red-500">*</span></label>
-                            <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir') }}" required
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('tempat_lahir') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: Jakarta">
-                            @error('tempat_lahir')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Tanggal Lahir -->
-                        <div>
-                            <label for="tanggal_lahir" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir <span class="text-red-500">*</span></label>
-                            <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('tanggal_lahir') border-red-500 @enderror px-4 py-2 border">
-                            @error('tanggal_lahir')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
-                            <input type="email" name="email" id="email" value="{{ old('email') }}" required
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('email') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: budi@email.com">
-                            @error('email')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Nomor HP -->
-                        <div>
-                            <label for="nomor_hp" class="block text-sm font-medium text-gray-700 mb-1">Nomor HP</label>
-                            <input type="text" name="nomor_hp" id="nomor_hp" value="{{ old('nomor_hp') }}"
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('nomor_hp') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: 081234567890">
-                            @error('nomor_hp')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
+                <ul class="list-disc list-inside mb-0" style="font-size: 0.875rem;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- User Data -->
+        <div class="card-header py-3">
+            <h6 class="mb-0 d-flex align-items-center gap-2">
+                <span class="rounded d-flex align-items-center justify-content-center" style="width: 2rem; height: 2rem; background: #dbeafe;">
+                    <i class="fas fa-user" style="color: #2563eb;"></i>
+                </span>
+                Data User
+            </h6>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="name" class="form-label" style="font-size: 0.875rem;">Nama Lengkap <span class="text-danger">*</span></label>
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                           class="form-control @error('name') is-invalid @enderror"
+                           placeholder="Contoh: Budi Santoso">
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-                
-                <!-- Data Akademik -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">Data Akademik</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Tahun Masuk -->
-                        <div>
-                            <label for="tahun_masuk" class="block text-sm font-medium text-gray-700 mb-1">Tahun Masuk <span class="text-red-500">*</span></label>
-                            <input type="number" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk') }}" required min="1990" max="{{ date('Y') }}"
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('tahun_masuk') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: 2018">
-                            @error('tahun_masuk')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Tahun Lulus -->
-                        <div>
-                            <label for="tahun_lulus" class="block text-sm font-medium text-gray-700 mb-1">Tahun Lulus <span class="text-red-500">*</span></label>
-                            <input type="number" name="tahun_lulus" id="tahun_lulus" value="{{ old('tahun_lulus') }}" required min="1990" max="{{ date('Y') }}"
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('tahun_lulus') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: 2022">
-                            @error('tahun_lulus')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Program Studi -->
-                        <div>
-                            <label for="program_studi" class="block text-sm font-medium text-gray-700 mb-1">Program Studi <span class="text-red-500">*</span></label>
-                            <input type="text" name="program_studi" id="program_studi" value="{{ old('program_studi') }}" required
-                                   class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('program_studi') border-red-500 @enderror px-4 py-2 border"
-                                   placeholder="Contoh: Teknik Informatika">
-                            @error('program_studi')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
+
+                <div class="col-md-6">
+                    <label for="email" class="form-label" style="font-size: 0.875rem;">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="email" id="email" value="{{ old('email') }}" required
+                           class="form-control @error('email') is-invalid @enderror"
+                           placeholder="budi@email.com">
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-                
-                <!-- Data Pekerjaan -->
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">Data Pekerjaan</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Status Pekerjaan -->
+
+                <div class="col-md-6">
+                    <label for="password" class="form-label" style="font-size: 0.875rem;">Password <span class="text-danger">*</span></label>
+                    <input type="password" name="password" id="password" required
+                           class="form-control @error('password') is-invalid @enderror"
+                           placeholder="Min. 8 karakter">
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-6">
+                    <label for="password_confirmation" class="form-label" style="font-size: 0.875rem;">Konfirmasi Password <span class="text-danger">*</span></label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" required
+                           class="form-control"
+                           placeholder="Ulangi password">
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Akademik -->
+        <div class="card-header py-3">
+            <h6 class="mb-0 d-flex align-items-center gap-2">
+                <span class="rounded d-flex align-items-center justify-content-center" style="width: 2rem; height: 2rem; background: #ede9fe;">
+                    <i class="fas fa-graduation-cap" style="color: #7c3aed;"></i>
+                </span>
+                Data Akademik
+            </h6>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="nim" class="form-label" style="font-size: 0.875rem;">NIM <span class="text-danger">*</span></label>
+                    <input type="text" name="nim" id="nim" value="{{ old('nim') }}" required
+                           class="form-control @error('nim') is-invalid @enderror"
+                           placeholder="Contoh: 20190101">
+                    @error('nim')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-4">
+                    <label for="fakultas" class="form-label" style="font-size: 0.875rem;">Fakultas</label>
+                    <input type="text" name="fakultas" id="fakultas" value="{{ old('fakultas') }}"
+                           class="form-control @error('fakultas') is-invalid @enderror"
+                           placeholder="Fakultas Teknik">
+                    @error('fakultas')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-4">
+                    <label for="program_studi" class="form-label" style="font-size: 0.875rem;">Program Studi</label>
+                    <input type="text" name="program_studi" id="program_studi" value="{{ old('program_studi') }}"
+                           class="form-control @error('program_studi') is-invalid @enderror"
+                           placeholder="Teknik Informatika">
+                    @error('program_studi')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label for="tahun_masuk" class="form-label" style="font-size: 0.875rem;">Tahun Masuk</label>
+                    <input type="number" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk') }}"
+                           min="1990" max="{{ date('Y') + 5 }}"
+                           class="form-control @error('tahun_masuk') is-invalid @enderror">
+                    @error('tahun_masuk')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label for="tahun_lulus" class="form-label" style="font-size: 0.875rem;">Tahun Lulus</label>
+                    <input type="number" name="tahun_lulus" id="tahun_lulus" value="{{ old('tahun_lulus') }}"
+                           min="1990" max="{{ date('Y') + 5 }}"
+                           class="form-control @error('tahun_lulus') is-invalid @enderror">
+                    @error('tahun_lulus')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label for="tanggal_lulus" class="form-label" style="font-size: 0.875rem;">Tanggal Lulus</label>
+                    <input type="date" name="tanggal_lulus" id="tanggal_lulus" value="{{ old('tanggal_lulus') }}"
+                           class="form-control @error('tanggal_lulus') is-invalid @enderror">
+                    @error('tanggal_lulus')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label for="ipk" class="form-label" style="font-size: 0.875rem;">IPK</label>
+                    <input type="number" name="ipk" id="ipk" value="{{ old('ipk') }}"
+                           step="0.01" min="0" max="4"
+                           class="form-control @error('ipk') is-invalid @enderror">
+                    @error('ipk')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
+        <!-- Catatan -->
+        <div class="card-body p-4 pt-0">
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle me-1"></i>
+                <strong>Catatan:</strong> Alumni ini akan dibuat dengan <strong>role: mahasiswa</strong> dan <strong>status akademik: lulus</strong>.
+                Data pribadi lainnya dapat dilengkapi oleh alumni sendiri melalui menu "Profil Saya".
+                Data pekerjaan ada di modul Tracer Study.
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="card-footer py-3 d-flex justify-content-end gap-2" style="background: #f9fafb;">
+            <a href="{{ route('admin.alumni.index') }}" class="btn btn-default">
+                Batal
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i> Simpan Alumni
+            </button>
+        </div>
+    </form>
+</div>
+@endsection

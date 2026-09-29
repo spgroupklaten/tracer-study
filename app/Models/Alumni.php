@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Alumni extends Model
 {
@@ -20,6 +22,7 @@ class Alumni extends Model
     }
 
     #[Fillable([
+        'user_id',
         'nim',
         'nama_lengkap',
         'jenis_kelamin',
@@ -43,6 +46,7 @@ class Alumni extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'nim',
         'nama_lengkap',
         'jenis_kelamin',
@@ -69,6 +73,46 @@ class Alumni extends Model
         'tahun_masuk' => 'integer',
         'tahun_lulus' => 'integer',
     ];
+
+    /**
+     * Get the user that owns this alumni (if linked).
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the tracer study for this alumni.
+     */
+    public function tracerStudy(): HasOne
+    {
+        return $this->hasOne(TracerStudy::class);
+    }
+
+    /**
+     * Check if alumni has a tracer study.
+     */
+    public function hasTracerStudy(): bool
+    {
+        return $this->tracerStudy()->exists();
+    }
+
+    /**
+     * Check if tracer study is submitted.
+     */
+    public function isTracerStudySubmitted(): bool
+    {
+        return $this->tracerStudy?->isSubmitted() ?? false;
+    }
+
+    /**
+     * Get tracer study status label.
+     */
+    public function getTracerStudyStatusLabelAttribute(): ?string
+    {
+        return $this->tracerStudy?->status_label;
+    }
 
     /**
      * Scope for searching alumni by name, nim, or email.

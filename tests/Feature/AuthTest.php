@@ -5,12 +5,49 @@ namespace Tests\Feature;
 use App\Enums\Role;
 use App\Models\User;
 use App\Models\Alumni;
+use App\Enums\AcademicStatus;
+use App\Models\Profile;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    /**
+     * Setup the test environment.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Disable CSRF middleware for testing
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+    }
+
+    /**
+     * Helper to create lulus profile directly.
+     */
+    protected function createLulusProfile(array $overrides = []): Profile
+    {
+        $user = User::factory()->create([
+            'name' => $overrides['name'] ?? 'Test User',
+            'email' => $overrides['email'] ?? fake()->unique()->safeEmail(),
+        ]);
+
+        return Profile::create(array_merge([
+            'user_id' => $user->id,
+            'nim' => fake()->unique()->numerify('########'),
+            'fakultass' => 'Fakultas Teknik',
+            'program_studi' => 'Teknik Informatika',
+            'tahun_masuk' => 2018,
+            'tahun_lulus' => 2022,
+            'academic_status' => AcademicStatus::Lulus,
+            'tempat_lahir' => 'Jakarta',
+            'tanggal_lahir' => '2000-01-01',
+            'jenis_kelamin' => 'L',
+            'angkatan' => 2018,
+        ], $overrides));
+    }
 
     /**
      * Test that guest cannot access admin dashboard.
@@ -95,8 +132,8 @@ class AuthTest extends TestCase
      */
     public function test_user_helper_methods(): void
     {
-        $admin = User::factory()->create(['role' => Role::Admin]);
-        $mahasiswa = User::factory()->create(['role' => Role::Mahasiswa]);
+        $admin = User::factory()->admin()->create();
+        $mahasiswa = User::factory()->mahasiswa()->create();
 
         $this->assertTrue($admin->isAdmin());
         $this->assertFalse($admin->isMahasiswa());
@@ -110,7 +147,7 @@ class AuthTest extends TestCase
     public function test_user_role_is_enum(): void
     {
         $user = User::factory()->create(['role' => Role::Admin]);
-        
+
         $this->assertInstanceOf(Role::class, $user->role);
         $this->assertEquals('admin', $user->role->value);
     }
@@ -136,7 +173,7 @@ class AuthTest extends TestCase
     public function test_user_factory_creates_mahasiswa_by_default(): void
     {
         $user = User::factory()->create();
-        
+
         $this->assertEquals(Role::Mahasiswa, $user->role);
     }
 
@@ -146,7 +183,7 @@ class AuthTest extends TestCase
     public function test_admin_factory_method_works(): void
     {
         $admin = User::factory()->admin()->create();
-        
+
         $this->assertEquals(Role::Admin, $admin->role);
     }
 
@@ -156,7 +193,7 @@ class AuthTest extends TestCase
     public function test_mahasiswa_factory_method_works(): void
     {
         $mahasiswa = User::factory()->mahasiswa()->create();
-        
+
         $this->assertEquals(Role::Mahasiswa, $mahasiswa->role);
     }
 
@@ -170,21 +207,20 @@ class AuthTest extends TestCase
     public function test_guest_cannot_create_alumni(): void
     {
         $response = $this->post(route('admin.alumni.store'), [
-            'nim' => '12345678',
-            'nama_lengkap' => 'Test Alumni',
-            'jenis_kelamin' => 'L',
-            'tempat_lahir' => 'Jakarta',
-            'tanggal_lahir' => '2000-01-01',
+            'name' => 'Test Alumni',
             'email' => 'test@email.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'nim' => '12345678',
+            'fakultass' => 'Fakultas Teknik',
+            'program_studi' => 'Teknik Informatika',
             'tahun_masuk' => 2018,
             'tahun_lulus' => 2022,
-            'program_studi' => 'Teknik Informatika',
-            'status_pekerjaan' => 'Bekerja',
         ]);
 
         // Guest should be rejected (302 redirect to login, 401, or 419 CSRF)
         $this->assertTrue(
-            $response->status() === 302 || 
+            $response->status() === 302 ||
             $response->status() === 401 ||
             $response->status() === 419
         );
@@ -195,23 +231,20 @@ class AuthTest extends TestCase
      */
     public function test_guest_cannot_update_alumni(): void
     {
-        $alumni = Alumni::factory()->create();
-        
-        $response = $this->put(route('admin.alumni.update', $alumni), [
-            'nim' => '12345678',
-            'nama_lengkap' => 'Updated Name',
-            'jenis_kelamin' => 'L',
-            'tempat_lahir' => 'Jakarta',
-            'tanggal_lahir' => '2000-01-01',
+        $profile = $this->createLulusProfile();
+
+        $response = $this->put(route('admin.alumni.update', $profile), [
+            'name' => 'Updated Name',
             'email' => 'updated@email.com',
+            'nim' => '12345678',
+            'fakultass' => 'Fakultas Teknik',
+            'program_studi' => 'Teknik Informatika',
             'tahun_masuk' => 2018,
             'tahun_lulus' => 2022,
-            'program_studi' => 'Teknik Informatika',
-            'status_pekerjaan' => 'Bekerja',
         ]);
 
         $this->assertTrue(
-            $response->status() === 302 || 
+            $response->status() === 302 ||
             $response->status() === 401 ||
             $response->status() === 419
         );
@@ -222,12 +255,12 @@ class AuthTest extends TestCase
      */
     public function test_guest_cannot_delete_alumni(): void
     {
-        $alumni = Alumni::factory()->create();
-        
-        $response = $this->delete(route('admin.alumni.destroy', $alumni));
+        $profile = $this->createLulusProfile();
+
+        $response = $this->delete(route('admin.alumni.destroy', $profile));
 
         $this->assertTrue(
-            $response->status() === 302 || 
+            $response->status() === 302 ||
             $response->status() === 401 ||
             $response->status() === 419
         );
@@ -249,23 +282,22 @@ class AuthTest extends TestCase
     public function test_mahasiswa_cannot_create_alumni(): void
     {
         $mahasiswa = User::factory()->create(['role' => Role::Mahasiswa]);
-        
+
         $response = $this->actingAs($mahasiswa)->post(route('admin.alumni.store'), [
-            'nim' => '12345678',
-            'nama_lengkap' => 'Test Alumni',
-            'jenis_kelamin' => 'L',
-            'tempat_lahir' => 'Jakarta',
-            'tanggal_lahir' => '2000-01-01',
+            'name' => 'Test Alumni',
             'email' => 'test@email.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'nim' => '12345678',
+            'fakultass' => 'Fakultas Teknik',
+            'program_studi' => 'Teknik Informatika',
             'tahun_masuk' => 2018,
             'tahun_lulus' => 2022,
-            'program_studi' => 'Teknik Informatika',
-            'status_pekerjaan' => 'Bekerja',
         ]);
 
         // Should be rejected (403 forbidden or 419 CSRF)
         $this->assertTrue(
-            $response->status() === 403 || 
+            $response->status() === 403 ||
             $response->status() === 419
         );
     }
@@ -276,23 +308,20 @@ class AuthTest extends TestCase
     public function test_mahasiswa_cannot_update_alumni(): void
     {
         $mahasiswa = User::factory()->create(['role' => Role::Mahasiswa]);
-        $alumni = Alumni::factory()->create();
-        
-        $response = $this->actingAs($mahasiswa)->put(route('admin.alumni.update', $alumni), [
-            'nim' => '12345678',
-            'nama_lengkap' => 'Updated Name',
-            'jenis_kelamin' => 'L',
-            'tempat_lahir' => 'Jakarta',
-            'tanggal_lahir' => '2000-01-01',
+        $profile = $this->createLulusProfile();
+
+        $response = $this->actingAs($mahasiswa)->put(route('admin.alumni.update', $profile), [
+            'name' => 'Updated Name',
             'email' => 'updated@email.com',
+            'nim' => '12345678',
+            'fakultass' => 'Fakultas Teknik',
+            'program_studi' => 'Teknik Informatika',
             'tahun_masuk' => 2018,
             'tahun_lulus' => 2022,
-            'program_studi' => 'Teknik Informatika',
-            'status_pekerjaan' => 'Bekerja',
         ]);
 
         $this->assertTrue(
-            $response->status() === 403 || 
+            $response->status() === 403 ||
             $response->status() === 419
         );
     }
@@ -303,12 +332,12 @@ class AuthTest extends TestCase
     public function test_mahasiswa_cannot_delete_alumni(): void
     {
         $mahasiswa = User::factory()->create(['role' => Role::Mahasiswa]);
-        $alumni = Alumni::factory()->create();
-        
-        $response = $this->actingAs($mahasiswa)->delete(route('admin.alumni.destroy', $alumni));
+        $profile = $this->createLulusProfile();
+
+        $response = $this->actingAs($mahasiswa)->delete(route('admin.alumni.destroy', $profile));
 
         $this->assertTrue(
-            $response->status() === 403 || 
+            $response->status() === 403 ||
             $response->status() === 419
         );
     }
@@ -319,7 +348,7 @@ class AuthTest extends TestCase
     public function test_mahasiswa_cannot_export_alumni(): void
     {
         $mahasiswa = User::factory()->create(['role' => Role::Mahasiswa]);
-        
+
         $response = $this->actingAs($mahasiswa)->get(route('admin.alumni.export'));
 
         $response->assertStatus(403);
@@ -331,8 +360,12 @@ class AuthTest extends TestCase
     public function test_admin_can_export_alumni(): void
     {
         $admin = User::factory()->create(['role' => Role::Admin]);
-        Alumni::factory()->count(3)->create();
-        
+
+        // Create 3 profiles directly
+        $this->createLulusProfile();
+        $this->createLulusProfile();
+        $this->createLulusProfile();
+
         $response = $this->actingAs($admin)->get(route('admin.alumni.export'));
 
         $response->assertStatus(200);
@@ -344,8 +377,10 @@ class AuthTest extends TestCase
      */
     public function test_public_alumni_index_accessible(): void
     {
-        Alumni::factory()->count(3)->create();
-        
+        $this->createLulusProfile();
+        $this->createLulusProfile();
+        $this->createLulusProfile();
+
         $response = $this->get(route('alumni.index'));
 
         $response->assertStatus(200);
@@ -356,9 +391,9 @@ class AuthTest extends TestCase
      */
     public function test_public_alumni_show_accessible(): void
     {
-        $alumni = Alumni::factory()->create();
-        
-        $response = $this->get(route('alumni.show', $alumni));
+        $profile = $this->createLulusProfile();
+
+        $response = $this->get(route('alumni.show', $profile));
 
         $response->assertStatus(200);
     }
@@ -381,9 +416,9 @@ class AuthTest extends TestCase
         User::factory()->admin()->create();
         User::factory()->mahasiswa()->create();
         User::factory()->create();
-        
+
         $usersWithNullRole = User::whereNull('role')->count();
-        
+
         $this->assertEquals(0, $usersWithNullRole);
     }
 
@@ -396,14 +431,26 @@ class AuthTest extends TestCase
      */
     public function test_public_alumni_index_hides_sensitive_data(): void
     {
-        Alumni::factory()->create([
+        // Create profile with sensitive data
+        $user = User::factory()->create([
             'email' => 'secret@email.com',
-            'nomor_hp' => '081234567890',
-            'alamat' => 'Secret Address',
-            'tempat_lahir' => 'Secret City',
-            'tanggal_lahir' => '2000-01-01',
         ]);
-        
+        $profile = Profile::create([
+            'user_id' => $user->id,
+            'nim' => '12345678',
+            'fakultass' => 'Fakultas Teknik',
+            'program_studi' => 'Teknik Informatika',
+            'academic_status' => AcademicStatus::Lulus,
+            'tempat_lahir' => 'Jakarta',
+            'tanggal_lahir' => '2000-01-01',
+            'jenis_kelamin' => 'L',
+            'alamat' => 'Secret Address',
+            'no_hp' => '081234567890',
+            'tahun_masuk' => 2018,
+            'tahun_lulus' => 2022,
+            'angkatan' => 2018,
+        ]);
+
         $response = $this->get(route('alumni.index'));
 
         $response->assertStatus(200);
@@ -417,15 +464,27 @@ class AuthTest extends TestCase
      */
     public function test_public_alumni_show_hides_sensitive_data(): void
     {
-        $alumni = Alumni::factory()->create([
+        // Create profile with sensitive data
+        $user = User::factory()->create([
             'email' => 'secret@email.com',
-            'nomor_hp' => '081234567890',
-            'alamat' => 'Secret Address',
-            'tempat_lahir' => 'Secret City',
-            'tanggal_lahir' => '2000-01-01',
         ]);
-        
-        $response = $this->get(route('alumni.show', $alumni));
+        $profile = Profile::create([
+            'user_id' => $user->id,
+            'nim' => '12345678',
+            'fakultass' => 'Fakultas Teknik',
+            'program_studi' => 'Teknik Informatika',
+            'academic_status' => AcademicStatus::Lulus,
+            'tempat_lahir' => 'Jakarta',
+            'tanggal_lahir' => '2000-01-01',
+            'jenis_kelamin' => 'L',
+            'alamat' => 'Secret Address',
+            'no_hp' => '081234567890',
+            'tahun_masuk' => 2018,
+            'tahun_lulus' => 2022,
+            'angkatan' => 2018,
+        ]);
+
+        $response = $this->get(route('alumni.show', $profile));
 
         $response->assertStatus(200);
         $response->assertDontSee('secret@email.com');
